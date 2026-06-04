@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProdByGreg</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #E8000D;
+    --black: #080808;
+    --white: #F5F5F0;
+    --gray: #1a1a1a;
+    --mono: 'Space Mono', monospace;
+    --display: 'Bebas Neue', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--mono);
+    cursor: crosshair;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--red); color: var(--white); }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 2.5rem;
+    border-bottom: 1px solid #222;
+    background: rgba(8,8,8,0.92);
+    backdrop-filter: blur(8px);
+  }
+
+  .nav-logo {
+    font-family: var(--display);
+    font-size: 1.6rem;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--red); }
+
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+
+  .nav-links a {
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #888;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--red); }
+
+  /* HERO */
+  #hero {
+    min-height: 80vh;
+    display: flex;
+    align-items: flex-end;
+    border-bottom: none;
+    padding-top: 60px;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 5rem 2.5rem 4rem;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 720px;
+  }
+
+  .hero-left::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -60px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: var(--red);
+    opacity: 0.06;
+    filter: blur(60px);
+    pointer-events: none;
+  }
+
+  .stats-card-wrap {
+    border-top: 1px solid #222;
+    border-bottom: 1px solid #222;
+  }
+
+  .stats-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #111;
+  }
+
+  .stat-item { padding: 2rem 2.5rem; }
+  .stat-item:first-child { border-right: 1px solid #222; }
+  .stat-divider { display: none; }
+
+  .hero-tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1.2rem;
+  }
+
+  .hero-name {
+    font-family: var(--display);
+    font-size: clamp(5rem, 10vw, 9rem);
+    line-height: 0.92;
+    color: var(--white);
+    margin-bottom: 2rem;
+  }
+
+  .hero-name em { font-style: normal; color: var(--red); display: block; }
+
+  .hero-bio {
+    font-size: 0.78rem;
+    line-height: 1.9;
+    color: #999;
+    max-width: 380px;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    border: 1px solid #333;
+    padding: 0.9rem 1.8rem;
+    transition: all 0.25s;
+    width: fit-content;
+  }
+
+  .hero-cta:hover { background: var(--red); border-color: var(--red); color: var(--white); }
+  .hero-cta .arrow { transition: transform 0.25s; }
+  .hero-cta:hover .arrow { transform: translateX(4px); }
+
+  .stat-num {
+    font-family: var(--display);
+    font-size: 3.2rem;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .stat-num span { color: var(--red); }
+
+  .stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .hero-marquee {
+    overflow: hidden;
+    border-top: 1px solid #222;
+    padding: 1rem 0;
+    white-space: nowrap;
+    margin-top: 3rem;
+  }
+
+  .marquee-inner {
+    display: inline-block;
+    animation: marquee 18s linear infinite;
+    font-family: var(--display);
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    color: #333;
+  }
+
+  .marquee-inner span { color: var(--red); margin: 0 1rem; }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* SECTION BASE */
+  section { padding: 6rem 2.5rem; border-bottom: 1px solid #222; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+
+  .section-num { font-size: 0.65rem; letter-spacing: 0.2em; color: var(--red); }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: var(--white);
+    letter-spacing: 0.03em;
+  }
+
+  /* SERVICES */
+  #services .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #222;
+    border: 1px solid #222;
+  }
+
+  .service-card {
+    background: var(--black);
+    padding: 2.5rem 2rem;
+    transition: background 0.25s;
+  }
+
+  .service-card:hover { background: var(--gray); }
+
+  .service-icon {
+    font-family: var(--display);
+    font-size: 3rem;
+    color: var(--red);
+    line-height: 1;
+    margin-bottom: 1.2rem;
+    opacity: 0.7;
+  }
+
+  .service-name {
+    font-family: var(--display);
+    font-size: 1.5rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.8rem;
+  }
+
+  .service-desc { font-size: 0.72rem; line-height: 1.9; color: #666; }
+
+  /* MADE BY ME */
+  #credits .credit-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: #222;
+    border: 1px solid #222;
+    margin-bottom: 1px;
+  }
+
+  .credit-info {
+    background: var(--black);
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 1px solid #222;
+  }
+
+  .credit-top {}
+
+  .credit-role-badges {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .credit-badge {
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--red);
+    color: var(--red);
+  }
+
+  .credit-title {
+    font-family: var(--display);
+    font-size: 3rem;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    color: var(--white);
+  }
+
+  .credit-artists {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    color: #555;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .credit-artists span { color: #888; }
+
+  .credit-year {
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    color: #333;
+    text-transform: uppercase;
+  }
+
+  .credit-bottom { margin-top: 2rem; }
+
+  .credit-stat-row {
+    display: flex;
+    gap: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #1a1a1a;
+  }
+
+  .credit-stat {}
+
+  .credit-stat-val {
+    font-family: var(--display);
+    font-size: 1.8rem;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .credit-stat-val span { color: var(--red); font-size: 1rem; }
+
+  .credit-stat-lbl {
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #444;
+    margin-top: 0.2rem;
+  }
+
+  .credit-embed {
+    background: #0a0a0a;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .credit-embed iframe {
+    width: 100%;
+    border: none;
+    display: block;
+    min-height: 280px;
+  }
+
+  /* CONTACT */
+  #contact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 0;
+  }
+
+  .contact-left {
+    padding: 6rem 2.5rem;
+    border-right: 1px solid #222;
+  }
+
+  .contact-right {
+    padding: 6rem 2.5rem;
+    background: var(--gray);
+  }
+
+  .contact-big {
+    font-family: var(--display);
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 0.95;
+    margin-bottom: 2rem;
+  }
+
+  .contact-big em { font-style: normal; color: var(--red); }
+
+  .contact-links { display: flex; flex-direction: column; gap: 1rem; margin-top: 3rem; }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid #222;
+    text-decoration: none;
+    color: #888;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .contact-link:hover { color: var(--red); }
+
+  .contact-form { display: flex; flex-direction: column; gap: 1.2rem; }
+
+  .contact-form input,
+  .contact-form textarea {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #333;
+    color: var(--white);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    padding: 0.8rem 0;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+    letter-spacing: 0.05em;
+  }
+
+  .contact-form input::placeholder,
+  .contact-form textarea::placeholder {
+    color: #444;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+  }
+
+  .contact-form input:focus,
+  .contact-form textarea:focus { border-color: var(--red); }
+
+  .contact-form textarea { min-height: 120px; }
+
+  .submit-btn {
+    align-self: flex-start;
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 1rem 2rem;
+    cursor: crosshair;
+    transition: opacity 0.2s;
+    margin-top: 0.5rem;
+  }
+
+  .submit-btn:hover { opacity: 0.85; }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2.5rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: #444;
+  }
+
+  footer a { color: #444; text-decoration: none; }
+  footer a:hover { color: var(--red); }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    .hero-left { padding: 3rem 1.5rem 2.5rem; }
+    #services .services-grid { grid-template-columns: 1fr; }
+    #contact { grid-template-columns: 1fr; }
+    .contact-left { border-right: none; border-bottom: 1px solid #222; }
+    section { padding: 4rem 1.5rem; }
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    #credits .credit-card { grid-template-columns: 1fr; }
+    .credit-info { border-right: none; border-bottom: 1px solid #222; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#hero">PROD<span>BY</span>GREG</a>
+  <ul class="nav-links">
+    <li><a href="#listen">Listen</a></li>
+    <li><a href="#credits">Credits</a></li>
+    <li><a href="#watch">Watch</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left" style="border-right:none;">
+    <p class="hero-tag">Producer · Sound Designer · Beatmaker</p>
+    <h1 class="hero-name">PROD<em>BY<br>GREG</em></h1>
+    <p class="hero-bio">
+      I'm a Ugandan music producer creating Afro sounds, house energy, and modern electronic music with a distinct edge. With a sharp ear for melody and detail, I make records built for both the streets and the speakers. Focused on growth, originality, and global standards, I'm developing a sound that represents the next wave from East Africa.
+    </p>
+    <a class="hero-cta" href="#listen">
+      Explore the work <span class="arrow">→</span>
+    </a>
+  </div>
+</section>
+
+<!-- STATS CARD -->
+<div class="stats-card-wrap">
+  <div class="stats-card">
+    <div class="stat-item">
+      <div class="stat-num">60<span>+</span></div>
+      <div class="stat-label">Beats produced</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-num">5<span>+</span></div>
+      <div class="stat-label">Releases</div>
+    </div>
+  </div>
+  <div class="hero-marquee">
+    <div class="marquee-inner">
+      AFROBEATS<span>✦</span>HOUSE<span>✦</span>TRAP<span>✦</span>AFRO FUSION<span>✦</span>AFRO DRILL<span>✦</span>DEEP HOUSE<span>✦</span>AFROBEATS<span>✦</span>HOUSE<span>✦</span>TRAP<span>✦</span>AFRO FUSION<span>✦</span>AFRO DRILL<span>✦</span>DEEP HOUSE<span>✦</span>
+    </div>
+  </div>
+</div>
+
+<!-- LISTEN -->
+<section id="listen">
+  <div class="section-header reveal">
+    <span class="section-num">01 —</span>
+    <h2 class="section-title">Listen</h2>
+  </div>
+  <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#222;border:1px solid #222;">
+    <div style="background:var(--black);padding:2rem 2.5rem;border-right:1px solid #222;">
+      <p style="font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--red);margin-bottom:0.8rem;">Now streaming</p>
+      <p style="font-family:var(--display);font-size:2rem;letter-spacing:0.04em;margin-bottom:0.5rem;">Phases</p>
+      <p style="font-size:0.72rem;color:#555;margin-bottom:1.5rem;">Full album · Audius</p>
+      <a href="https://audius.co/prodbygreg/phases" target="_blank" rel="noopener" style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:#888;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#888'">Open on Audius ↗</a>
+      <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid #222;">
+        <p style="font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:#555;margin-bottom:1rem;">Also on</p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <a href="https://open.spotify.com/artist/1GhaAZXTAdJJgBHTPQs2mp" target="_blank" rel="noopener" style="font-size:0.65rem;letter-spacing:0.12em;color:#aaa;text-transform:uppercase;border:1px solid #444;padding:0.4rem 0.8rem;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.color='#1DB954';this.style.borderColor='#1DB954'" onmouseout="this.style.color='#aaa';this.style.borderColor='#444'">Spotify ↗</a>
+          <span style="font-size:0.65rem;letter-spacing:0.12em;color:#2a2a2a;text-transform:uppercase;border:1px solid #222;padding:0.4rem 0.8rem;">Apple Music</span>
+          <span style="font-size:0.65rem;letter-spacing:0.12em;color:#2a2a2a;text-transform:uppercase;border:1px solid #222;padding:0.4rem 0.8rem;">Tidal</span>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--black);padding:0;">
+      <iframe src="https://audius.co/embed/album/prodbygreg/phases?flavor=card" width="100%" height="480" allow="encrypted-media" style="border:none;display:block;"></iframe>
+    </div>
+  </div>
+
+  <!-- Spotify artist embed -->
+  <div class="reveal" style="margin-top:1px;border:1px solid #222;border-top:none;">
+    <iframe style="border-radius:0;" src="https://open.spotify.com/embed/artist/1GhaAZXTAdJJgBHTPQs2mp?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+  </div>
+</section>
+
+<!-- MADE BY ME -->
+<section id="credits">
+  <div class="section-header reveal">
+    <span class="section-num">02 —</span>
+    <h2 class="section-title">Made By Me</h2>
+  </div>
+  <p class="reveal" style="font-size:0.72rem;color:#555;line-height:1.9;max-width:480px;margin-bottom:3rem;margin-top:-2rem;">Records I produced and engineered for other artists. My sound, their vision.</p>
+
+  <!-- YUMMY -->
+  <div class="credit-card reveal">
+    <div class="credit-info">
+      <div class="credit-top">
+        <div class="credit-role-badges">
+          <span class="credit-badge">Producer</span>
+          <span class="credit-badge">Engineer</span>
+        </div>
+        <div class="credit-title">Yummy</div>
+        <div class="credit-artists">Ace Kaawa <span>&amp; See Kirya</span></div>
+        <div class="credit-year">Single · 2026</div>
+      </div>
+      <div class="credit-bottom">
+        <div class="credit-stat-row">
+          <div class="credit-stat">
+            <div class="credit-stat-val">2<span>:26</span></div>
+            <div class="credit-stat-lbl">Duration</div>
+          </div>
+          <div class="credit-stat">
+            <div class="credit-stat-val">2026</div>
+            <div class="credit-stat-lbl">Released</div>
+          </div>
+        </div>
+        <a href="https://open.spotify.com/track/1sEDZnWmk5fKKwKgvVkJAG" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:0.6rem;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:#888;text-decoration:none;margin-top:1.5rem;transition:color 0.2s;" onmouseover="this.style.color='#1DB954'" onmouseout="this.style.color='#888'">Open on Spotify ↗</a>
+      </div>
+    </div>
+    <div class="credit-embed">
+      <iframe src="https://open.spotify.com/embed/track/1sEDZnWmk5fKKwKgvVkJAG?utm_source=generator" width="100%" height="100%" style="min-height:280px;border:none;" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- WATCH -->
+<section id="watch">
+  <div class="section-header reveal">
+    <span class="section-num">03 —</span>
+    <h2 class="section-title">Watch</h2>
+  </div>
+  <div class="reveal" style="display:grid;grid-template-columns:2fr 1fr;gap:1px;background:#222;border:1px solid #222;">
+    <div style="background:var(--black);position:relative;aspect-ratio:16/9;min-height:300px;">
+      <iframe style="width:100%;height:100%;border:none;display:block;" src="https://www.youtube.com/embed/vhQASPxBueY?list=PLLCttntoC3cV6Ck5Hopmf_EmcN29Jx6w8" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <div style="background:var(--black);padding:2.5rem 2rem;display:flex;flex-direction:column;justify-content:space-between;border-left:1px solid #222;">
+      <div>
+        <p style="font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--red);margin-bottom:0.8rem;">YouTube channel</p>
+        <p style="font-family:var(--display);font-size:1.8rem;letter-spacing:0.04em;line-height:1.1;margin-bottom:1rem;">Behind the boards</p>
+        <p style="font-size:0.72rem;line-height:1.9;color:#555;">Music is art, Art is beauty, Beauty is in the eye of the beholder</p>
+      </div>
+      <a href="https://www.youtube.com/@HouseOCash" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:0.8rem;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--white);text-decoration:none;border:1px solid #333;padding:0.9rem 1.4rem;transition:all 0.25s;margin-top:2rem;width:fit-content;" onmouseover="this.style.background='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.background='transparent';this.style.borderColor='#333'">Subscribe ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-header reveal">
+    <span class="section-num">04 —</span>
+    <h2 class="section-title">What I Do</h2>
+  </div>
+  <div class="services-grid reveal">
+    <div class="service-card">
+      <div class="service-icon">01</div>
+      <div class="service-name">Beat Production</div>
+      <div class="service-desc">Custom beats built from scratch — tailored to your sound, your style, your vision. No templates, no shortcuts.</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">02</div>
+      <div class="service-name">Mixing & Mastering</div>
+      <div class="service-desc">Pro-level mixes that translate across every speaker and platform. Your music, loud and clear.</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">03</div>
+      <div class="service-name">Sound Design</div>
+      <div class="service-desc">Original samples, synth patches, and textures. Every element designed to hit different.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-left reveal">
+    <div class="section-num" style="margin-bottom:1.5rem;">05 —</div>
+    <h2 class="contact-big">LET'S<br>MAKE<br><em>NOISE.</em></h2>
+    <div class="contact-links">
+      <a class="contact-link" href="#">Instagram <span>↗</span></a>
+      <a class="contact-link" href="https://audius.co/prodbygreg" target="_blank" rel="noopener">Audius <span>↗</span></a>
+      <a class="contact-link" href="https://www.youtube.com/@HouseOCash" target="_blank" rel="noopener">YouTube <span>↗</span></a>
+      <a class="contact-link" href="https://open.spotify.com/artist/1GhaAZXTAdJJgBHTPQs2mp" target="_blank" rel="noopener">Spotify <span>↗</span></a>
+    </div>
+  </div>
+  <div class="contact-right reveal">
+    <p style="font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:#555;margin-bottom:2.5rem;">Send a message</p>
+    <form class="contact-form" onsubmit="handleSubmit(event)">
+      <input type="text" placeholder="Your name" />
+      <input type="email" placeholder="Your email" />
+      <input type="text" placeholder="Subject — collab, licensing, mix..." />
+      <textarea placeholder="Message"></textarea>
+      <button class="submit-btn" type="submit">Send it →</button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 ProdByGreg. All rights reserved.</span>
+  <span>Made with obsession.</span>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => observer.observe(r));
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.submit-btn');
+    btn.textContent = 'Sent ✓';
+    btn.style.background = '#1a1a1a';
+    btn.style.border = '1px solid #333';
+    setTimeout(() => { btn.textContent = 'Send it →'; btn.style.background = 'var(--red)'; btn.style.border = 'none'; }, 3000);
+  }
+</script>
+</body>
+</html>
